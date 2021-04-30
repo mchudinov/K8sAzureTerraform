@@ -1,0 +1,13 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: interactive-shell
+spec:
+  containers:
+    - name: interactive-shell
+      image: nginx
+      resources:        
+        limits:
+          memory: 50Mi
+          cpu: 300m
+ 
