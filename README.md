@@ -29,12 +29,9 @@ Access to code repository in GitHub:
 `https://github.com/mchudinov/K8sAzureTerraform.git`
 
 ### Azure environment
-* Storage account *sacommonterraform*
-* Storage account container *terraform*
-
-Names are hardcoded in *main.tf* terraform script.
-
-Both storage accounts and container exist in DIFA Azure subscription.
+* Service principal that has access to subscription
+* Storage account *....*
+* Storage account container *terraform* (will be created if not present)
 
 ## Tools
 This instruction assumes that you use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview). Cloud Shell is an online tool.
@@ -59,13 +56,14 @@ Cloning into 'K8sAzureTerraform'...
 `cd K8sAzureTerraform`
 
 ### 4. Run deploy.sh script
-`./deploy.sh -c mytestk8s -n 3 -r westeurope`
+`./deploy.sh -c mytestk8s -n 3 -r westeurope -p XXX-XXXX-XXX-XXX -s terraformstate`
 
 Where flags are:
-*  s) Azure service principal ID for terraform
 *  c) Cluster name
 *  n) Number of nodes
 *  r) Azure region
+*  p) Azure service principal ID for terraform
+*  s) Storage account name
 
 After a couple of minutes a new Kubernetes cluster will be ready.
 
