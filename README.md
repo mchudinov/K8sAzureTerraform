@@ -18,20 +18,23 @@ An Azure Kubernetes Service (AKS) with a static public IP address for egress tra
 ║ └────────────────────┘                                       ║               
 ╚══════════════════════════════════════════════════════════════╝                                                                                               
 ```
-## Documentation references
+* Hardcoded Kubernetes version: **1.20.5**
+* Hardcoded VM size for nodes: **Standard_B2s** (2 vCPU, 4GiB memory)
+
+These values can be chenged in _deploy.sh_ script.
+
+## Related documentation
 *  [Tutorial: Create a Kubernetes cluster with Azure Kubernetes Service using Terraform](https://docs.microsoft.com/en-us/azure/developer/terraform/create-k8s-cluster-with-tf-and-aks)
 *  [Use a static public IP address for egress traffic in Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/egress)
 
 ## Prerequsites
 ### Source code
-Access to code repository in GitHub:
-
-`https://github.com/mchudinov/K8sAzureTerraform.git`
+Access to code repository in GitHub
+https://github.com/mchudinov/K8sAzureTerraform.git
 
 ### Azure environment
-* Service principal that has access to subscription
-* Storage account *....*
-* Storage account container *terraform* (will be created if not present)
+* Service principal that has access to subscription at _Contributor_ role
+* Storage account to store terrraform state
 * Azure Kubernetes policy insights registered on subscription level
 ```sh
 az provider register --namespace Microsoft.ContainerService
@@ -39,40 +42,41 @@ az provider register --namespace Microsoft.PolicyInsights
 ```
 
 ## Tools
-This instruction assumes that you use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview). Cloud Shell is an online tool.
+This instruction assumes that you use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview)
 
 In order to use this instruction from a local machine, the folloiwng tools are needed:
-*  Terraform version >= 0.15
+*  Terraform version >= 0.14
 *  Azure CLI version >= 2.8
 *  git
 *  kubectl - Kubernetes command line tool
+*  Bash shell 
 
 ## How to deploy
 ### 1. Login to Cloud Shell
 Open Azure Cloud Shell https://shell.azure.com in a web-browser and login.
 
 ### 2. Clone the repository 
-```sh
-git clone https://github.com/mchudinov/K8sAzureTerraform.git
+`git clone https://github.com/mchudinov/K8sAzureTerraform.git`
 
-Cloning into 'K8sAzureTerraform'...
-```
 ### 3. Change to source code directory
 `cd K8sAzureTerraform`
 
 ### 4. Run deploy.sh script
 `./deploy.sh -c mytestk8s -n 3 -r westeurope -p XXX-XXXX-XXX-XXX -s terraformstate`
 
-Where flags are:
+The keys are:
 *  c) Cluster name
 *  n) Number of nodes
 *  r) Azure region
-*  p) Azure service principal ID for terraform
-*  s) Storage account name
+*  p) Azure service principal ID for Terraform
+*  s) Storage account name for Terraform state
 
 After a couple of minutes a new Kubernetes cluster will be ready.
 
 # How-tos
+## Add Kubernetes credentials to the local .cube config file
+`az aks get-credentials --name <AKS_NAME> --resource-group <RESOURCE_GROUP>`
+
 ## Verify egress address
 This command will run a tiny Alpine linux on a pode inside the cluster:
 
@@ -96,13 +100,7 @@ Then exit the Alpine:
 
 Alpine pod will be immidiately automatically destroed after exit.
 
-## Kubernetes dashboard is deprecated
-The AKS dashboard add-on is set for deprecation. Use the Kubernetes resource view in the Azure portal (preview) instead.
-
-https://docs.microsoft.com/en-us/azure/aks/kubernetes-dashboard
-
 ## How to run an interactive shell
-
 `kubectl apply -f interactive.yaml`
 
 ## Check CSI driver is running
@@ -113,13 +111,13 @@ kubectl get pods -l app=secrets-store-csi-driver
 ```
 
 # Clean up
-How to delete everything created in Azure:
 
+## Delete everything created in Azure:
 Use `./destroy.sh` script with the same parameters as for `./deploy.sh`
 
 For example:
 
-`./destroy.sh -c mytestk8s -n 5`
+`./destroy.sh -c mytestk8s -n 3 -r westeurope -p XXX-XXXX-XXX-XXX -s terraformstate`
 
 Delete the source code directory in Cloud Shell:
 
