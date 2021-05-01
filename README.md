@@ -32,6 +32,11 @@ Access to code repository in GitHub:
 * Service principal that has access to subscription
 * Storage account *....*
 * Storage account container *terraform* (will be created if not present)
+* Azure Kubernetes policy insights registered on subscription level
+```sh
+az provider register --namespace Microsoft.ContainerService
+az provider register --namespace Microsoft.PolicyInsights
+```
 
 ## Tools
 This instruction assumes that you use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview). Cloud Shell is an online tool.
