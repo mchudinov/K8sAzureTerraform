@@ -37,8 +37,8 @@ fi
 
 if test -z "$region" 
 then
-  echo "Azure region is not defined. Use -r flag. Default NorthEurope"
-  export region=northeurope
+  echo "Azure region is not defined. Use -r flag. Default WestEurope"
+  export region=westeurope
 fi
 
 echo "Cluster name:                     $name";

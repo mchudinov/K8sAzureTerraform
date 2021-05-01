@@ -66,8 +66,8 @@ Open Azure Cloud Shell https://shell.azure.com in a web-browser and login.
 
 The keys are:
 *  c) Cluster name
-*  n) Number of nodes
-*  r) Azure region
+*  n) Number of nodes (default 3)
+*  r) Azure region (default WestEurope)
 *  p) Azure service principal ID for Terraform
 *  s) Storage account name for Terraform state
 
