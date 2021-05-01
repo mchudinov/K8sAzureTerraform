@@ -9,9 +9,9 @@ An Azure Kubernetes Service (AKS) with a static public IP address for egress tra
 ║ │░ Kuebernetes(AKS) ░│   ┌─<─┤ Inbound IP ├<─────────────────╟<─────https───────╢ web-browser  ║
 ║ │░░░░░░░░░░░░░░░░░░░░│   │   └────────────┘                  ║                  ╚═════╤══╤═════╝
 ║ │░░░ Ingress Nginx <─┼<──┘                                   ║                       ═╧══╧═ 
-║ │░░░░░░░░░░░░░░░░░░░░│       ┌────────────┐                  ║                    
-║ │░░░░░░░░░░ secrets ░├<────<─┤ Key Vault  │                  ║
-║ │░░░░░░░░░░░░░░░░░░░░│       └────────────┘                  ║
+║ │░░░░░░░░░░░░░░░░░░░░│       ┌────────────┐ ┌────────────┐   ║
+║ │░░░░░░░░░░ secrets ░│       │LogAnalytics│ │ StorageAcc │   ║
+║ │░░░░░░░░░░░░░░░░░░░░│       └────────────┘ └────────────┘   ║
 ║ │░░░░░░░░░░░░░░░░░░░░│                         ┌─────────────╢               
 ║ │░░░░░░░░░░░░░░░░░░░░┼>───────────────────>────┤ Outbound IP ║ 
 ║ │░░░░░░░░░░░░░░░░░░░░│                         └─────────────╢                
@@ -73,6 +73,10 @@ The keys are:
 
 After a couple of minutes a new Kubernetes cluster will be ready.
 
+Terraform places all the created resource in two resource groups:
+* rg-<cluster_name> - this group is for Kubernetes cluster itself
+* rg-node-<cluster_name> - this one is for VMs of the cluster
+
 # How-tos
 ## Add Kubernetes credentials to the local .cube config file
 `az aks get-credentials --name <AKS_NAME> --resource-group <RESOURCE_GROUP>`
@@ -112,11 +116,19 @@ kubectl get pods -l app=secrets-store-csi-driver
 
 # Clean up
 ## Delete everything created in Azure:
+### destroy.sh
 Use _destroy.sh_ script with the same parameters as for _deploy.sh_
 
 For example:
 
 `./destroy.sh -c mytestk8s -n 3 -r westeurope -p XXX-XXXX-XXX-XXX -s terraformstate`
+
+### Manually
+If _destroy.sh_ script fails everything that was created can be easily erased manyally. Just delete the resource groups created by Terraform: 
+```sh
+az group delete --resource-group rg-<cluster_name>
+az group delete --resource-group rg-node-<cluster_name>
+```
 
 ## Reset changes in git
 `git reset`
