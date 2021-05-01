@@ -1,16 +1,31 @@
 #!/bin/bash
 
-while getopts c:i:n:e: flag
+while getopts c:n:r:p:s: flag
 do
   case "${flag}" in
     c) name=${OPTARG};;
     n) nodes=${OPTARG};;
+    r) region=${OPTARG};;
+    p) principal=${OPTARG};;
+    s) storage=${OPTARG};;
   esac
 done
+
+if test -z "$principal" 
+then
+  echo "Azure service principal ID for Terraform is empty. Use -s flag"
+  exit 0  
+fi
 
 if test -z "$name" 
 then
   echo "Cluster name is empty. Use -c flag"
+  exit 0  
+fi
+
+if test -z "$storage" 
+then
+  echo "Azure storage account to keep Terraform state is empty. Use -s flag"
   exit 0  
 fi
 
@@ -20,14 +35,21 @@ then
   export nodes=3
 fi
 
+if test -z "$region" 
+then
+  echo "Azure region is not defined. Use -r flag. Default NorthEurope"
+  export region=northeurope
+fi
+
 echo "Cluster name:                     $name";
 echo "Number of nodes:                  $nodes";
+echo "Azure region:                     $region";
 
 export DEPLOYMENT_NAME=$name
 export RESOURCE_GROUP=rg-$DEPLOYMENT_NAME
 export AKS_NAME=k8s-$DEPLOYMENT_NAME
-export SERVICE_PRINCIPAL_TERRAFORM_ID=846f0948-ede3-4a1a-82fb-5cb3c47ba4ca
-export STORAGE_TERRAFORM_NAME=sacommonterraform  
+export SERVICE_PRINCIPAL_TERRAFORM_ID=$principal
+export STORAGE_TERRAFORM_NAME=$storage   
 export STORAGE_TERRAFORM_CONTAINER=terraform
 export STORAGE_TERRAFORM_CONTAINER_KEY=tfstate-$DEPLOYMENT_NAME
 
@@ -62,5 +84,8 @@ export TF_VAR_k8s_agent_count=$nodes
 export TF_VAR_deployment_name=$DEPLOYMENT_NAME
 export TF_VAR_rg_name=$RESOURCE_GROUP
 export TF_VAR_k8s_cluster_name=$AKS_NAME
+export TF_VAR_azure_region=$region
+export TF_VAR_k8s_version="1.20.5"
+export TF_VAR_k8s_vm_size="Standard_B2s"
 
 terraform destroy -auto-approve
