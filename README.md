@@ -111,14 +111,15 @@ kubectl get pods -l app=secrets-store-csi-driver
 ```
 
 # Clean up
-
 ## Delete everything created in Azure:
-Use `./destroy.sh` script with the same parameters as for `./deploy.sh`
+Use _destroy.sh_ script with the same parameters as for _deploy.sh_
 
 For example:
 
 `./destroy.sh -c mytestk8s -n 3 -r westeurope -p XXX-XXXX-XXX-XXX -s terraformstate`
 
-Delete the source code directory in Cloud Shell:
+## Reset changes in git
+`git reset`
 
+## Delete the source code directory in Cloud Shell
 `rm -rf K8sAzureTerraform`
