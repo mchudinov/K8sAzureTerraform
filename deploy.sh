@@ -115,7 +115,7 @@ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo add csi-secrets-store-provider-azure https://raw.githubusercontent.com/Azure/secrets-store-csi-driver-provider-azure/master/charts
 helm repo update
 
-# Add Azure Key Vault as a secret provider
+# Add Azure Key Vault CSI driver
 helm install csi-secrets-store-provider-azure/csi-secrets-store-provider-azure --generate-name
 
 # Install Azure Policy Add-on for AKS
