@@ -33,18 +33,13 @@ Access to code repository in GitHub
 https://github.com/mchudinov/K8sAzureTerraform.git
 
 ### Azure environment
-* Service principal that has access to subscription at _Contributor_ role
-* Storage account to store terrraform state
-* Azure Kubernetes policy insights registered on subscription level
-```sh
-az provider register --namespace Microsoft.ContainerService
-az provider register --namespace Microsoft.PolicyInsights
-```
+* Service principal that has access to subscription with _Contributor_ role
+* Storage account to store Terraform state
 
 ## Tools
 This instruction assumes that you use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview)
 
-In order to use this instruction from a local machine, the folloiwng tools are needed:
+In order to use this instruction from a local environment, the following tools are required:
 *  Terraform version >= 0.14
 *  Azure CLI version >= 2.8
 *  git
@@ -131,7 +126,7 @@ az group delete --resource-group rg-node-<cluster_name>
 ```
 
 ## Reset changes in git
-`git reset`
+`git reset --hard`
 
 ## Delete the source code directory in Cloud Shell
 `rm -rf K8sAzureTerraform`

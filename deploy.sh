@@ -68,7 +68,7 @@ az storage container create --account-name $STORAGE_TERRAFORM_NAME --name $STORA
 export STORAGE_TERRAFORM_KEY=$(az storage account keys list --account-name $STORAGE_TERRAFORM_NAME --query "[0].value" --out tsv)
 if test -z "$STORAGE_TERRAFORM_KEY" 
 then
-  echo "Error: STORAGE_TERRAFORM_KEY is empty. Terraform needs it to save the state. Perhaps you need az login. Exit script"
+  echo "Error: STORAGE_TERRAFORM_KEY is empty. Terraform requires it to save the state. Perhaps you need az login. Exit script"
   exit
 fi
 
@@ -76,7 +76,7 @@ fi
 export SERVICE_PRINCIPAL_TERRAFORM_SECRET=$(az ad app credential reset --id  $SERVICE_PRINCIPAL_TERRAFORM_ID --append --query "password" --out tsv)
 if test -z "$SERVICE_PRINCIPAL_TERRAFORM_SECRET" 
 then
-  echo "Error: SERVICE_PRINCIPAL_TERRAFORM_SECRET is empty. Terraform needs it to operate. Exit script"
+  echo "Error: SERVICE_PRINCIPAL_TERRAFORM_SECRET is empty. Terraform requires it to operate. Exit script"
   exit
 fi
 
@@ -104,9 +104,6 @@ terraform plan -out out.plan
 # Apply the plan
 terraform apply out.plan
 
-# Discard all local changes
-# git reset --hard
-
 # Add cluster key to the local .kubeconfig file
 az aks get-credentials --name $AKS_NAME --resource-group $RESOURCE_GROUP
 
@@ -118,17 +115,13 @@ helm repo update
 # Add Azure Key Vault CSI driver
 helm install csi-secrets-store-provider-azure/csi-secrets-store-provider-azure --generate-name
 
-# Install Azure Policy Add-on for AKS
-az aks enable-addons --addons azure-policy --resource-group $RESOURCE_GROUP --name $AKS_NAME --addons azure-policy
-kubectl get constrainttemplates
-
 echo Cluster FQDN:
 terraform output fqdn
 
 export PUBLIC_IP_INBOUND=$(terraform output public_ip_inbound_address)
 if test -z "$PUBLIC_IP_INBOUND" 
 then
-  echo "Error: PUBLIC_IP_INBOUND is empty. It is needed to configure ingress. Exit script"
+  echo "Error: PUBLIC_IP_INBOUND is empty. It is required to configure the ingress. Exit script"
   exit
 fi
 echo "PUBLIC_IP_INBOUND:    $PUBLIC_IP_INBOUND"
@@ -136,8 +129,3 @@ echo "PUBLIC_IP_INBOUND:    $PUBLIC_IP_INBOUND"
 # Nginx ingress controller
 kubectl create namespace ingress-nginx
 helm install ingress-nginx ingress-nginx/ingress-nginx --namespace ingress-nginx --set controller.service.loadBalancerIP=$PUBLIC_IP_INBOUND 
-
-# Restrict access to the Kubernetes Service Management API by granting API access only to IP addresses in specific range.
-# https://docs.microsoft.com/bs-cyrl-ba/azure/aks/api-server-authorized-ip-ranges
-# CURRENT_IP=$(dig +short myip.opendns.com @resolver1.opendns.com)
-# az aks update --resource-group $RESOURCE_GROUP --name $AKS_NAME --api-server-authorized-ip-ranges $CURRENT_IP/32
