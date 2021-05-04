@@ -32,7 +32,7 @@ fi
 if test -z "$nodes" 
 then
   echo "Number of nodes in the cluster is not defined. Use -n flag. Use default 3 nodes."
-  export nodes=3
+  export nodes=1
 fi
 
 if test -z "$region" 
